@@ -1,0 +1,11 @@
+db_password = '***'
+db_address = 'htmldp.com'
+db_login = 'tournaments'
+db_database = 'tournaments'
+server_hostname = 'localhost'
+server_port = 27911
+server_logfile = '../pball/qconsole27911.log'
+server_rconpassword =  '***'
+server_id = 0
+league_type = 1
+league_max_wrong_rounds = 3
