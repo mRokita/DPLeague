@@ -11,13 +11,14 @@ class Data:
 
 def on_elim(arg, server):
     if data.match_started < 3:
-        return
+        return # zakończ jeśli mecz nie został rozpoczęty
     global data
     db.increase_player_score(data.match_id, server.GetID(arg['player1']), "kills")
     db.increase_player_score(data.match_id, server.GetID(arg['player2']), "deaths")
     update_scores()
 
 def update_scores():
+    # aktualizacja wyników w bazie danych
     global data
     scores = main_server.Scores()
     data.team1_score = scores[data.team1_color]
@@ -55,8 +56,7 @@ def on_mapchange(arg, server):
         data.team1_color = data.colors[0]
         data.team2_color = data.colors[1]
         data.match_started = 2
-        print "KKKKK"
-    if data.match_started == 3:
+    if data.match_started == 3: # zakończenie meczu i dodanie danych do bazy
         if data.team1_score > data.team2_score:
             main_server.rcon("sv newmap pbcup")
             db.set_current(data.match_id, 3)
@@ -75,12 +75,12 @@ def on_mapchange(arg, server):
 def on_roundstarted(arg, server):
     global data
     teams = main_server.Teams()
-    if data.match_started == 3:
+    if data.match_started == 3: # Inicjalizacja analizy błędów w balansie teamów
         players = main_server.rcon_players()
         for player in players:
             if (player['id'] in teams[data.team1_color]) or (player['id'] in teams[data.team2_color]):
                 db.add_scores(data.match_id, player['dplogin'])
-    if ((data.team1_color not in teams)
+    if ((data.team1_color not in teams) # Szukanie błędów w balansie teamów
         or (data.team2_color not in teams)
         or (len(teams[data.team1_color]) != config.league_type)
         or (len(teams[data.team2_color]) != config.league_type)):
@@ -109,13 +109,11 @@ def on_roundstarted(arg, server):
                         db.set_current(data.match_id, 4)
                     default_vars()
     else:
-        if not data.match_started == 3:
+        if not data.match_started == 3: #Rozpoczecie meczu
             data.match_started = 3
             main_server.Say("{C}BMatch started!")
             db.set_current(data.match_id, 2)
             players = main_server.rcon_players()
-            print teams
-            print players
             for player in players:
                 if (player['id'] in teams[data.team1_color]) or (player['id'] in teams[data.team2_color]):
                     db.add_scores(data.match_id, player['dplogin'])
@@ -125,8 +123,7 @@ def on_roundstarted(arg, server):
 def on_entered(arg, server):
     global data
     data.match = db.get_match(config.server_id)
-    print "MS: %s" % data.match_started
-    if data.match and data.match_started == 0:
+    if data.match and data.match_started == 0: # Initializacja teamow, uruchomienie mapy
         data.wrong_rounds = 0
         data.team1_id = data.match['team1']
         data.team2_id = data.match['team2']
@@ -141,7 +138,6 @@ def on_entered(arg, server):
         data.match_id = data.match['Id']
         data.map_id = data.match['map_id']
         data.map_info = db.get_map(data.map_id)
-        print (data.team1_roster, data.team2_roster)
         if not data.match_started:
             main_server.Say("{C}BMatch: %s is defending %s from %s" %
                             (data.team1_info['name'], data.map_info['mapname'], data.team2_info['name']))
@@ -159,7 +155,7 @@ def default_vars():
     global data
     data.match = {} # Dane o aktualnym meczu
     data.wrong_rounds = 0 # Złe rundy - rundy z niezbalansowanymi zespołami itp. 
-    data.match_started = 0 # Czy mecz rozpoczęty - 0 nie - 1 po eliminacji mapy 2- rozpoczeto mecz i statystyki są aktywne
+    data.match_started = 0 # Czy mecz rozpoczęty - 0 nie - 1 wybrano kolory 2- ? 3-rozpoczęto mecz, statystyki aktywne
     data.team1_id = None	# ID z bazy danych dla teamow
     data.team2_id = None
     data.team1_color = None # Kolor teamu - niebieski, czerwony, żółty lub fioletowy
