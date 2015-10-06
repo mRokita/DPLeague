@@ -155,28 +155,30 @@ def on_entered(arg, server):
 
 
 def default_vars():
+    # Domyślne zmienne dla serwera
     global data
-    data.match = {}
-    data.wrong_rounds = 0
-    data.match_started = 0
-    data.team1_id = None
+    data.match = {} # Dane o aktualnym meczu
+    data.wrong_rounds = 0 # Złe rundy - rundy z niezbalansowanymi zespołami itp. 
+    data.match_started = 0 # Czy mecz rozpoczęty - 0 nie - 1 po eliminacji mapy 2- rozpoczeto mecz i statystyki są aktywne
+    data.team1_id = None	# ID z bazy danych dla teamow
     data.team2_id = None
-    data.team1_color = None
+    data.team1_color = None # Kolor teamu - niebieski, czerwony, żółty lub fioletowy
     data.team2_color = None
-    data.team1_score = 0
+    data.team1_score = 0 # Punkty teamu
     data.team2_score = 0
-    data.team1_roster = []
+    data.team1_roster = [] # Skład teamu [zbudowany z ID graczy w bazie]
     data.team2_roster = []
-    data.map_info=[]
-    data.map_id=None
+    data.map_info=[] # info o mapie
+    data.map_id=None # ID mapy w bazie
 
 
 if __name__ == "__main__":
+    # Stworzenie obiektu typu Server (pypb2lib.Server) z parametrami z configa
     main_server = Server(hostname=config.server_hostname,
                          rcon_password=config.server_rconpassword,
                          port=config.server_port,
                          logfile=config.server_logfile)
-    # server variables
+    # Bindowanie do zdarzeń
     data=Data()
     default_vars()
     main_server.Bind(EVT_ENTERED, on_entered)
